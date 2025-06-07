@@ -1,0 +1,15 @@
+export default {
+    id: 'ID',
+    email_id: '邮箱ID',
+    email__address: '邮箱地址',
+    form: '来件人',
+    to: '收件人',
+    title: '邮件标题',
+    content: '邮件内容',
+    is_read: '已读',
+    'is_read 0': '否',
+    'is_read 1': '是',
+    code: '验证码',
+    create_time: '创建时间',
+    'quick Search Fields': 'ID',
+}

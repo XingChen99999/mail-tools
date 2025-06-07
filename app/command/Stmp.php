@@ -109,6 +109,7 @@ class Stmp extends Command
                         echo "验证码： " . join(',', extractVerificationCodes($email['body']));
                         echo "\r\n";
                         print_r($email);
+                        print_r($mailData[$fd]['data']);
                         go(function () use ($email, $to) {
                             $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
                             $this->smtp_send_mail($to, 'xingchen010301@gmail.com', $email['subject'], $email['body']);

@@ -9,6 +9,7 @@ use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
 use Swoole\Server;
+use function Co\run;
 
 class Stmp extends Command
 {
@@ -29,6 +30,7 @@ class Stmp extends Command
             // 其他 SSL 选项
             'ssl_verify_peer' => false,
             'ssl_allow_self_signed' => true,
+            ‘
         ]);
 // 存储每个连接的邮件数据
         $mailData = [];
@@ -52,83 +54,85 @@ class Stmp extends Command
         $server->on('receive', function (Server $server, $fd, $reactorId, $data) use (&$mailData) {
             // echo 123;
             // echo $data;
+            run(function () use ($server, $fd, $data, &$mailData) {
+                $command = strtoupper(trim($data));
+                $response = '';
 
-            $command = strtoupper(trim($data));
-            $response = '';
+                switch ($mailData[$fd]['state']) {
+                    case 'INIT':
+                        if (strpos($command, 'HELO') === 0 || strpos($command, 'EHLO') === 0) {
+                            $response = "250 Hello, I'm Swoole Mail Server\r\n";
+                            $mailData[$fd]['state'] = 'READY';
+                        } else {
+                            $response = "503 Bad sequence of commands\r\n";
+                        }
+                        break;
 
-            switch ($mailData[$fd]['state']) {
-                case 'INIT':
-                    if (strpos($command, 'HELO') === 0 || strpos($command, 'EHLO') === 0) {
-                        $response = "250 Hello, I'm Swoole Mail Server\r\n";
-                        $mailData[$fd]['state'] = 'READY';
-                    } else {
-                        $response = "503 Bad sequence of commands\r\n";
-                    }
-                    break;
+                    case 'READY':
+                        if (strpos($command, 'MAIL FROM:') === 0) {
+                            $mailData[$fd]['from'] = substr($command, 10);
+                            $response = "250 OK\r\n";
+                            $mailData[$fd]['state'] = 'FROM';
+                        } else {
+                            $response = "503 Expected MAIL FROM\r\n";
+                        }
+                        break;
 
-                case 'READY':
-                    if (strpos($command, 'MAIL FROM:') === 0) {
-                        $mailData[$fd]['from'] = substr($command, 10);
-                        $response = "250 OK\r\n";
-                        $mailData[$fd]['state'] = 'FROM';
-                    } else {
-                        $response = "503 Expected MAIL FROM\r\n";
-                    }
-                    break;
+                    case 'FROM':
+                        if (strpos($command, 'RCPT TO:') === 0) {
+                            $mailData[$fd]['to'][] = substr($command, 8);
+                            $response = "250 OK\r\n";
+                        } elseif ($command === 'DATA') {
+                            $response = "354 Start mail input; end with <CRLF>.<CRLF>\r\n";
+                            $mailData[$fd]['state'] = 'DATA';
+                        } else {
+                            $response = "503 Expected RCPT TO or DATA\r\n";
+                        }
+                        break;
 
-                case 'FROM':
-                    if (strpos($command, 'RCPT TO:') === 0) {
-                        $mailData[$fd]['to'][] = substr($command, 8);
-                        $response = "250 OK\r\n";
-                    } elseif ($command === 'DATA') {
-                        $response = "354 Start mail input; end with <CRLF>.<CRLF>\r\n";
-                        $mailData[$fd]['state'] = 'DATA';
-                    } else {
-                        $response = "503 Expected RCPT TO or DATA\r\n";
-                    }
-                    break;
+                    case 'DATA':
 
-                case 'DATA':
+                        $line = str_replace("\r\n..", "\r\n.", $data);
+                        $mailData[$fd]['data'] .= $line;
+                        if (strlen($data) - strrpos($data, '.') <= 5) {
+                            // 保存邮件到文件
+                            // $filename = 'mail_' . date('Ymd_His') . '_' . uniqid() . '.eml';
+                            // file_put_contents($filename, $mailData[$fd]['data'].$data);
 
-                    $line = str_replace("\r\n..", "\r\n.", $data);
-                    $mailData[$fd]['data'] .= $line;
-                    if (strlen($data) - strrpos($data, '.') <= 5) {
-                        // 保存邮件到文件
-                        // $filename = 'mail_' . date('Ymd_His') . '_' . uniqid() . '.eml';
-                        // file_put_contents($filename, $mailData[$fd]['data'].$data);
+                            $response = "250 Message accepted for delivery\r\n";
+                            $mailData[$fd]['state'] = 'READY';
+                            $from = normalizeEmail($mailData[$fd]['from']);
+                            $to = normalizeEmail($mailData[$fd]['to'][0]);
+                            $email = parseEmailToUtf8($mailData[$fd]['data']);
+                            echo "From: " . normalizeEmail($mailData[$fd]['from']) . "\n";
+                            echo "To: " . normalizeEmail($mailData[$fd]['to'][0]) . "\n";
+                            echo "验证码： " . join(',', extractVerificationCodes($email['body']));
+                            go(function () use ($email,$to) {
+                                $this->smtp_send_mail($to,'971626354@qq.com',$email['subject'],$email['body']);
+                            });
+                        }
+                        break;
 
-                        $response = "250 Message accepted for delivery\r\n";
-                        $mailData[$fd]['state'] = 'READY';
-                        $from = normalizeEmail($mailData[$fd]['from']);
-                        $to = normalizeEmail($mailData[$fd]['to'][0]);
-                        $email = parseEmailToUtf8($mailData[$fd]['data']);
-                        echo "From: " . normalizeEmail($mailData[$fd]['from']) . "\n";
-                        echo "To: " . normalizeEmail($mailData[$fd]['to'][0]) . "\n";
-                        echo "验证码： " . join(',', extractVerificationCodes($email['body']));
-                        go(function () use ($email,$to) {
-                            $this->smtp_send_mail($to,'971626354@qq.com',$email['subject'],$email['body']);
-                        });
-                    }
-                    break;
-
-                case 'QUIT':
-                    $response = "221 Bye\r\n";
-                    $server->close($fd);
-                    break;
-            }
-
-            // 处理QUIT命令（任何状态都可以退出）
-            if ($command === 'QUIT') {
-                $response = "221 Bye\r\n";
-
-            }
-            if ($response) {
-                $server->send($fd, $response);
-                if ($command === 'QUIT') {
-                    $server->close($fd);
+                    case 'QUIT':
+                        $response = "221 Bye\r\n";
+                        $server->close($fd);
+                        break;
                 }
 
-            }
+                // 处理QUIT命令（任何状态都可以退出）
+                if ($command === 'QUIT') {
+                    $response = "221 Bye\r\n";
+
+                }
+                if ($response) {
+                    $server->send($fd, $response);
+                    if ($command === 'QUIT') {
+                        $server->close($fd);
+                    }
+
+                }
+            });
+
         });
 
         $server->on('close', function (Server $server, $fd) use (&$mailData) {

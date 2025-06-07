@@ -113,20 +113,20 @@ class Stmp extends Command
                         echo "\r\n";
 //                        print_r($email);
 //                        print_r($mailData[$fd]['data']);
-                        print_r($email);
+
                         go(function () use ($email, $from,  $to,$code){
-                           $email = Email::where('address', $to)->find();
-                           if (!$email){
-                               $email = Email::create([
+                           $em = Email::where('address', $to)->find();
+                           if (!$em){
+                               $em = Email::create([
                                    'address' => $to,
                                    'delivery_time' => date('Y-m-d H:i:s'),
                                ]);
                            }else{
-                               $email->delivery_time = date('Y-m-d H:i:s');
-                               $email->save();
+                               $em->delivery_time = date('Y-m-d H:i:s');
+                               $em->save();
                            }
                            Message::create([
-                               'email_id'=>$email->id,
+                               'email_id'=>$em->id,
                                'form'=>$from,
                                'to'=>$to,
                                'title'=>$email['subject']??'',

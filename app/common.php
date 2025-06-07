@@ -617,7 +617,7 @@ function parseEmailToUtf8(string $rawEmail): array
                         $decoded = $pb;
                 }
                 // 转 UTF-8
-                $body = trim(mb_convert_encoding($decoded, 'UTF-8', $cs));
+                $body = html_entity_decode(trim(mb_convert_encoding($decoded, 'UTF-8', $cs), ENT_QUOTES));
                 break;
             }
         }

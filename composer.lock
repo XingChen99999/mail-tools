@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1356468edfc2fa141cd94e78172d1ef2",
+    "content-hash": "a54064c5332b3778585d11c1e98f0118",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -2154,6 +2154,38 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "swoole/ide-helper",
+            "version": "4.8.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/swoole/ide-helper.git",
+                "reference": "d100c446b2e3d56430cbcab5dc3fa20a9f35c4ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/swoole/ide-helper/zipball/d100c446b2e3d56430cbcab5dc3fa20a9f35c4ef",
+                "reference": "d100c446b2e3d56430cbcab5dc3fa20a9f35c4ef",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Team Swoole",
+                    "email": "team@swoole.com"
+                }
+            ],
+            "description": "IDE help files for Swoole.",
+            "support": {
+                "issues": "https://github.com/swoole/ide-helper/issues",
+                "source": "https://github.com/swoole/ide-helper/tree/4.8.13"
+            },
+            "time": "2023-03-20T06:46:24+00:00"
+        },
         {
             "name": "symfony/var-dumper",
             "version": "v5.4.48",

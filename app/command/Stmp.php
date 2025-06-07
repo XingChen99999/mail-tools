@@ -1,5 +1,5 @@
 <?php
-declare (strict_types = 1);
+declare (strict_types=1);
 
 namespace app\command;
 
@@ -9,6 +9,7 @@ use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
 use Swoole\Server;
+
 class Stmp extends Command
 {
     protected function configure()
@@ -18,10 +19,9 @@ class Stmp extends Command
             ->setDescription('the stmp command');
     }
 
-    protected function execute(Input $input, Output $output)
+    protected function listen()
     {
-
-// 创建 Swoole TCP 服务器
+        // 创建 Swoole TCP 服务器
         $server = new Server('0.0.0.0', 25, SWOOLE_BASE, SWOOLE_SOCK_TCP);
         $server->set([
             'ssl_cert_file' => __DIR__ . '/smtp.crt',
@@ -99,12 +99,15 @@ class Stmp extends Command
 
                         $response = "250 Message accepted for delivery\r\n";
                         $mailData[$fd]['state'] = 'READY';
-//                print_r($mailData);
-//               echo strtoupper( trim($mailData[$fd]['from'],'<>'));
-//                echo "Mail saved to: $filename\n";
+                        $from = normalizeEmail($mailData[$fd]['from']);
+                        $to = normalizeEmail($mailData[$fd]['to'][0]);
+                        $email = parseEmailToUtf8($mailData[$fd]['data']);
                         echo "From: " . normalizeEmail($mailData[$fd]['from']) . "\n";
                         echo "To: " . normalizeEmail($mailData[$fd]['to'][0]) . "\n";
-                        echo "验证码： " . join(',', extractVerificationCodes(parseEmailToUtf8($mailData[$fd]['data'])['body']));
+                        echo "验证码： " . join(',', extractVerificationCodes($email['body']));
+                        go(function () use ($email,$to) {
+                            $this->smtp_send_mail($to,'971626354@qq.com',$email['subject'],$email['body']);
+                        });
                     }
                     break;
 
@@ -137,16 +140,18 @@ class Stmp extends Command
         $server->start();
     }
 
-
-    public function send()
+    protected function execute(Input $input, Output $output)
     {
+        $this->listen();
+    }
+
+
 
         /**
          * 使用PHP实现基于MX记录的SMTP发信示例（无认证，纯手写协议）
          * 注意：此代码适合实验、学习，不能保证邮件成功投递到所有服务商
          */
-
-        function smtp_send_mail($from, $to, $subject, $body)
+    public function smtp_send_mail($from, $to, $subject, $body)
         {
             // 解析收件人域名MX记录
             $domain = substr(strrchr($to, "@"), 1); // 提取收件人域名
@@ -244,15 +249,6 @@ class Stmp extends Command
             fclose($fp);
             echo "邮件发送成功\n";
             return true;
-        }
-
-// 测试调用
-        $from = 'yyds12323sadasda@vjike.cn';    // 请替换成你自己的发件地址
-        $to = 'xingchen010301@gmail.com';             // 收件地址
-        $subject = '测试邮件';
-        $body = '这是测试邮件的正文内容';
-
-        smtp_send_mail($from, $to, $subject, $body);
 
     }
 }

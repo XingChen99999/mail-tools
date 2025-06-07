@@ -3,7 +3,7 @@
         'name' => 'wonderful-code/buildadmin',
         'pretty_version' => '2.x-dev',
         'version' => '2.9999999.9999999.9999999-dev',
-        'reference' => '688dac70772dcbadfe51f539e0c5b02fd90a52ab',
+        'reference' => '4f17cefa214085a0f168cf5d4a0987ddfacb5fd3',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -135,6 +135,15 @@
             'install_path' => __DIR__ . '/../ralouphie/getallheaders',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'swoole/ide-helper' => array(
+            'pretty_version' => '4.8.13',
+            'version' => '4.8.13.0',
+            'reference' => 'd100c446b2e3d56430cbcab5dc3fa20a9f35c4ef',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../swoole/ide-helper',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'symfony/deprecation-contracts' => array(
             'pretty_version' => 'v3.0.2',
@@ -330,7 +339,7 @@
         'wonderful-code/buildadmin' => array(
             'pretty_version' => '2.x-dev',
             'version' => '2.9999999.9999999.9999999-dev',
-            'reference' => '688dac70772dcbadfe51f539e0c5b02fd90a52ab',
+            'reference' => '4f17cefa214085a0f168cf5d4a0987ddfacb5fd3',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

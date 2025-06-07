@@ -99,7 +99,7 @@ class Stmp extends Command
                         // file_put_contents($filename, $mailData[$fd]['data'].$data);
 
                         $response = "250 Message accepted for delivery\r\n";
-                        $mailData[$fd]['state'] = 'READY';
+
                         $from = normalizeEmail($mailData[$fd]['from']);
                         $to = normalizeEmail($mailData[$fd]['to'][0]);
                         $email = parseEmailToUtf8($mailData[$fd]['data']);
@@ -109,26 +109,20 @@ class Stmp extends Command
                         go(function () use ($email, $to) {
                             $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
                         });
+                        $mailData[$fd]['state'] = 'QUIT';
                     }
                     break;
 
                 case 'QUIT':
+                    echo "QUIT";
                     $response = "221 Bye\r\n";
+                    $server->send($fd, $response);
                     $server->close($fd);
-                    break;
+                    return;
             }
 
-            // 处理QUIT命令（任何状态都可以退出）
-            if ($command === 'QUIT') {
-                $response = "221 Bye\r\n";
-
-            }
             if ($response) {
                 $server->send($fd, $response);
-                if ($command === 'QUIT') {
-                    $server->close($fd);
-                }
-
             }
         });
 

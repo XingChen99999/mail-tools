@@ -538,13 +538,14 @@ function extract115CharCodes(string $text): array
 
 function extractVerificationCodes(string $text): array
 {
+    $text = strip_tags($text);
     $res = extract115CharCodes($text);
     if ($res) {
         return $res;
     }
     // \b 确保前后是单词边界，避免匹配到更长字符串中的子串
     // [A-Z0-9]{4,6} 只匹配大写字母或数字，长度 4–6
-    preg_match_all('/\b[A-Z0-9]{4,6}\b/', strip_tags($text), $matches);
+    preg_match_all('/\b[A-Z0-9]{5,6}\b/', ($text), $matches);
     return $matches[0];
 }
 

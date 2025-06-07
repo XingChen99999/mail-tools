@@ -8,7 +8,7 @@ use think\console\Input;
 use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
-
+use Swoole\Server;
 class Stmp extends Command
 {
     protected function configure()
@@ -22,7 +22,7 @@ class Stmp extends Command
     {
 
 
-    use Swoole\Server;
+
 
 
         /**

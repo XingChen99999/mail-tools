@@ -24,6 +24,7 @@ class ComposerStaticInitef3e4877d6ed99943923b6436014f6ac
     public static $prefixLengthsPsr4 = array (
         'v' => 
         array (
+            'vring\\' => 6,
             'voku\\helper\\' => 12,
             'voku\\' => 5,
         ),
@@ -74,6 +75,10 @@ class ComposerStaticInitef3e4877d6ed99943923b6436014f6ac
     );
 
     public static $prefixDirsPsr4 = array (
+        'vring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/vring/phputil/src',
+        ),
         'voku\\helper\\' => 
         array (
             0 => __DIR__ . '/..' . '/voku/anti-xss/src/voku/helper',
@@ -101,9 +106,9 @@ class ComposerStaticInitef3e4877d6ed99943923b6436014f6ac
         ),
         'think\\' => 
         array (
-            0 => __DIR__ . '/..' . '/topthink/think-helper/src',
-            1 => __DIR__ . '/..' . '/topthink/think-orm/src',
-            2 => __DIR__ . '/..' . '/topthink/framework/src/think',
+            0 => __DIR__ . '/..' . '/topthink/framework/src/think',
+            1 => __DIR__ . '/..' . '/topthink/think-helper/src',
+            2 => __DIR__ . '/..' . '/topthink/think-orm/src',
         ),
         'modules\\' => 
         array (
@@ -155,8 +160,8 @@ class ComposerStaticInitef3e4877d6ed99943923b6436014f6ac
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (

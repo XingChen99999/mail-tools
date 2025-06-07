@@ -1,0 +1,32 @@
+{
+  "name": "vring/phputil",
+  "type": "library",
+  "description": "php个人常用库",
+  "keywords" : ["vring", "phputil"],
+  "authors": [
+    {
+      "name": "vring",
+      "email": "971626354@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2.0,<=8.1",
+
+    "ext-pdo": "*",
+    "ext-curl": "*",
+    "ext-pdo_mysql": "*",
+    "ext-json": "*"
+  },
+  "license":"Apache-2.0",
+  "autoload": {
+    "psr-4": {
+      "vring\\": "src/"
+    }
+  },
+  "config": {
+
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  }
+}

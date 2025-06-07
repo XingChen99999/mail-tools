@@ -29,7 +29,8 @@
         "ext-bcmath": "*",
         "ext-iconv": "*",
         "ext-json": "*",
-        "ext-gd": "*"
+        "ext-gd": "*",
+        "vring/phputil": "dev-main"
     },
     "require-dev": {
         "symfony/var-dumper": "^5.4",

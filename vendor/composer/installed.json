@@ -2328,6 +2328,61 @@
                 }
             ],
             "install-path": "../voku/portable-utf8"
+        },
+        {
+            "name": "vring/phputil",
+            "version": "dev-main",
+            "version_normalized": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vnser/phputil.git",
+                "reference": "609343cdd5a3cc49dbd79933e1c9cc66111438b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vnser/phputil/zipball/609343cdd5a3cc49dbd79933e1c9cc66111438b0",
+                "reference": "609343cdd5a3cc49dbd79933e1c9cc66111438b0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-pdo": "*",
+                "ext-pdo_mysql": "*",
+                "php": ">=7.2.0,<=8.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "time": "2025-06-07T09:59:58+00:00",
+            "default-branch": true,
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "vring\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "vring",
+                    "email": "971626354@qq.com"
+                }
+            ],
+            "description": "php个人常用库",
+            "keywords": [
+                "phputil",
+                "vring"
+            ],
+            "support": {
+                "issues": "https://github.com/vnser/phputil/issues",
+                "source": "https://github.com/vnser/phputil/tree/main"
+            },
+            "install-path": "../vring/phputil"
         }
     ],
     "dev": true,

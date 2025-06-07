@@ -116,6 +116,7 @@ class Stmp extends Command
                     }
                     break;
 
+
                 case 'QUIT':
                     echo "QUIT";
                     $response = "221 Bye\r\n";

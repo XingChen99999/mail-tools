@@ -3,6 +3,8 @@ declare (strict_types=1);
 
 namespace app\command;
 
+use app\admin\model\Email;
+use app\admin\model\Message;
 use co;
 use think\console\Command;
 use think\console\Input;
@@ -104,12 +106,33 @@ class Stmp extends Command
                         $from = normalizeEmail($mailData[$fd]['from']);
                         $to = normalizeEmail($mailData[$fd]['to'][0]);
                         $email = parseEmailToUtf8($mailData[$fd]['data']);
+                        $code = extractVerificationCodes($email['body']);
                         echo "From: " . normalizeEmail($mailData[$fd]['from']) . "\n";
                         echo "To: " . normalizeEmail($mailData[$fd]['to'][0]) . "\n";
                         echo "验证码： " . join(',', extractVerificationCodes($email['body']));
                         echo "\r\n";
-                        print_r($email);
-                        print_r($mailData[$fd]['data']);
+//                        print_r($email);
+//                        print_r($mailData[$fd]['data']);
+                        go(function () use ($email, $from,  $to,$code){
+                           $email = Email::where('email', $to)->find();
+                           if (!$email){
+                               $email = Email::create([
+                                   'address' => $to,
+                                   'delivery_time' => date('Y-m-d H:i:s'),
+                               ]);
+                           }else{
+                               $email->delivery_time = date('Y-m-d H:i:s');
+                               $email->save();
+                           }
+                           Message::create([
+                               'email_id'=>$email->id,
+                               'form'=>$from,
+                               'to'=>$to,
+                               'title'=>$email['subject'],
+                               'content'=>$email['body'],
+                               'code'=>$code[0]??''
+                           ]);
+                        });
                         go(function () use ($email, $to) {
                             $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
                             $this->smtp_send_mail($to, 'xingchen010301@gmail.com', $email['subject'], $email['body']);

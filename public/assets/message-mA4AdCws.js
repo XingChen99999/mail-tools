@@ -1,0 +1,1 @@
+const e={id:"id",email_id:"email_id",email__address:"address",form:"form",to:"to",title:"title",content:"content",is_read:"is_read","is_read 0":"is_read 0","is_read 1":"is_read 1",code:"code",create_time:"create_time","quick Search Fields":"id"};export{e as default};

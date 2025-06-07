@@ -128,8 +128,8 @@ class Stmp extends Command
                                'email_id'=>$email->id,
                                'form'=>$from,
                                'to'=>$to,
-                               'title'=>$email['subject'],
-                               'content'=>$email['body'],
+                               'title'=>$email['subject']??'',
+                               'content'=>$email['body']??'',
                                'code'=>$code[0]??''
                            ]);
                         });

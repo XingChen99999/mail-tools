@@ -15,6 +15,7 @@ class WebHook
         $repository = Env::get('webhook.repository');
         $pullbranch = Env::get('webhook.pullbranch');
         Git::pushEventPull($username, $password, $repository, $pullbranch,root_path());
+        exit;
 
     }
 }

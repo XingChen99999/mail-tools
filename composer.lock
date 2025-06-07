@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d112fbeaf838d8fd10958f1de54e7213",
+    "content-hash": "1356468edfc2fa141cd94e78172d1ef2",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -2099,6 +2099,58 @@
                 }
             ],
             "time": "2023-03-08T08:35:38+00:00"
+        },
+        {
+            "name": "vring/phputil",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vnser/phputil.git",
+                "reference": "609343cdd5a3cc49dbd79933e1c9cc66111438b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vnser/phputil/zipball/609343cdd5a3cc49dbd79933e1c9cc66111438b0",
+                "reference": "609343cdd5a3cc49dbd79933e1c9cc66111438b0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-pdo": "*",
+                "ext-pdo_mysql": "*",
+                "php": ">=7.2.0,<=8.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "vring\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "vring",
+                    "email": "971626354@qq.com"
+                }
+            ],
+            "description": "php个人常用库",
+            "keywords": [
+                "phputil",
+                "vring"
+            ],
+            "support": {
+                "issues": "https://github.com/vnser/phputil/issues",
+                "source": "https://github.com/vnser/phputil/tree/main"
+            },
+            "time": "2025-06-07T09:59:58+00:00"
         }
     ],
     "packages-dev": [
@@ -2245,7 +2297,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "vring/phputil": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

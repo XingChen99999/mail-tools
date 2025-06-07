@@ -113,6 +113,7 @@ class Stmp extends Command
                         echo "\r\n";
 //                        print_r($email);
 //                        print_r($mailData[$fd]['data']);
+                        print_r($email);
                         go(function () use ($email, $from,  $to,$code){
                            $email = Email::where('address', $to)->find();
                            if (!$email){

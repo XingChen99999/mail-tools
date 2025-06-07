@@ -147,6 +147,16 @@ class Stmp extends Command
         $this->listen();
     }
 
+// 发送命令函数，发送后读取服务器响应
+    protected  function send_cmd($fp, $cmd)
+    {
+        echo "C: $cmd";
+        fwrite($fp, $cmd);
+        $resp = fgets($fp, 515);
+        echo "S: $resp";
+        return $resp;
+    }
+
 
     /**
      * 使用PHP实现基于MX记录的SMTP发信示例（无认证，纯手写协议）
@@ -156,6 +166,7 @@ class Stmp extends Command
     {
         // 解析收件人域名MX记录
         $domain = substr(strrchr($to, "@"), 1); // 提取收件人域名
+        $from_domain = substr(strrchr($from, "@"), 1); // 提取收件人域名
         if (!$domain) {
             echo "收件人地址格式错误\n";
             return false;
@@ -182,19 +193,10 @@ class Stmp extends Command
         $response = fgets($fp, 515);
         echo "S: $response";
 
-        // 发送命令函数，发送后读取服务器响应
-        function send_cmd($fp, $cmd)
-        {
-            echo "C: $cmd";
-            fwrite($fp, $cmd);
-            $resp = fgets($fp, 515);
-            echo "S: $resp";
-            return $resp;
-        }
 
         // HELO
-        $localhost = 'vjike.cn';  // 你服务器的主机名
-        $resp = send_cmd($fp, "HELO $localhost\r\n");
+        $localhost = $from_domain;  // 你服务器的主机名
+        $resp = $this->send_cmd($fp, "HELO $localhost\r\n");
         if (strpos($resp, '250') !== 0) {
             echo "HELO失败\n";
             fclose($fp);
@@ -202,7 +204,7 @@ class Stmp extends Command
         }
 
         // MAIL FROM
-        $resp = send_cmd($fp, "MAIL FROM:<$from>\r\n");
+        $resp = $this->send_cmd($fp, "MAIL FROM:<$from>\r\n");
         if (strpos($resp, '250') !== 0) {
             echo "MAIL FROM失败\n";
             fclose($fp);
@@ -210,7 +212,7 @@ class Stmp extends Command
         }
 
         // RCPT TO
-        $resp = send_cmd($fp, "RCPT TO:<$to>\r\n");
+        $resp = $this->send_cmd($fp, "RCPT TO:<$to>\r\n");
         if (strpos($resp, '250') !== 0 && strpos($resp, '251') !== 0) {
             echo "RCPT TO失败\n";
             fclose($fp);
@@ -218,7 +220,7 @@ class Stmp extends Command
         }
 
         // DATA
-        $resp = send_cmd($fp, "DATA\r\n");
+        $resp = $this->send_cmd($fp, "DATA\r\n");
         if (strpos($resp, '354') !== 0) {
             echo "DATA命令被拒绝\n";
             fclose($fp);
@@ -246,7 +248,7 @@ class Stmp extends Command
         }
 
         // QUIT
-        send_cmd($fp, "QUIT\r\n");
+        $this->send_cmd($fp, "QUIT\r\n");
         fclose($fp);
         echo "邮件发送成功\n";
         return true;

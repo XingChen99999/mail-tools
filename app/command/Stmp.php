@@ -114,7 +114,7 @@ class Stmp extends Command
 //                        print_r($email);
 //                        print_r($mailData[$fd]['data']);
                         go(function () use ($email, $from,  $to,$code){
-                           $email = Email::where('email', $to)->find();
+                           $email = Email::where('address', $to)->find();
                            if (!$email){
                                $email = Email::create([
                                    'address' => $to,

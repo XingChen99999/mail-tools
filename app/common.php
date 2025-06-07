@@ -634,7 +634,7 @@ function parseEmailToUtf8(string $rawEmail): array
                     : ($enc === 'quoted-printable'
                         ? quoted_printable_decode($pb)
                         : $pb);
-                $body = trim(strip_tags(mb_convert_encoding($decoded, 'UTF-8', $cs)));
+                $body = trim(mb_convert_encoding($decoded, 'UTF-8', $cs));
                 break;
             }
         }

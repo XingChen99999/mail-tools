@@ -53,86 +53,85 @@ class Stmp extends Command
         $server->on('receive', function (Server $server, $fd, $reactorId, $data) use (&$mailData) {
             // echo 123;
             // echo $data;
-            run(function () use ($server, $fd, $data, &$mailData) {
-                $command = strtoupper(trim($data));
-                $response = '';
 
-                switch ($mailData[$fd]['state']) {
-                    case 'INIT':
-                        if (strpos($command, 'HELO') === 0 || strpos($command, 'EHLO') === 0) {
-                            $response = "250 Hello, I'm Swoole Mail Server\r\n";
-                            $mailData[$fd]['state'] = 'READY';
-                        } else {
-                            $response = "503 Bad sequence of commands\r\n";
-                        }
-                        break;
+            $command = strtoupper(trim($data));
+            $response = '';
 
-                    case 'READY':
-                        if (strpos($command, 'MAIL FROM:') === 0) {
-                            $mailData[$fd]['from'] = substr($command, 10);
-                            $response = "250 OK\r\n";
-                            $mailData[$fd]['state'] = 'FROM';
-                        } else {
-                            $response = "503 Expected MAIL FROM\r\n";
-                        }
-                        break;
-
-                    case 'FROM':
-                        if (strpos($command, 'RCPT TO:') === 0) {
-                            $mailData[$fd]['to'][] = substr($command, 8);
-                            $response = "250 OK\r\n";
-                        } elseif ($command === 'DATA') {
-                            $response = "354 Start mail input; end with <CRLF>.<CRLF>\r\n";
-                            $mailData[$fd]['state'] = 'DATA';
-                        } else {
-                            $response = "503 Expected RCPT TO or DATA\r\n";
-                        }
-                        break;
-
-                    case 'DATA':
-
-                        $line = str_replace("\r\n..", "\r\n.", $data);
-                        $mailData[$fd]['data'] .= $line;
-                        if (strlen($data) - strrpos($data, '.') <= 5) {
-                            // 保存邮件到文件
-                            // $filename = 'mail_' . date('Ymd_His') . '_' . uniqid() . '.eml';
-                            // file_put_contents($filename, $mailData[$fd]['data'].$data);
-
-                            $response = "250 Message accepted for delivery\r\n";
-                            $mailData[$fd]['state'] = 'READY';
-                            $from = normalizeEmail($mailData[$fd]['from']);
-                            $to = normalizeEmail($mailData[$fd]['to'][0]);
-                            $email = parseEmailToUtf8($mailData[$fd]['data']);
-                            echo "From: " . normalizeEmail($mailData[$fd]['from']) . "\n";
-                            echo "To: " . normalizeEmail($mailData[$fd]['to'][0]) . "\n";
-                            echo "验证码： " . join(',', extractVerificationCodes($email['body']));
-                            go(function () use ($email,$to) {
-                                $this->smtp_send_mail($to,'971626354@qq.com',$email['subject'],$email['body']);
-                            });
-                        }
-                        break;
-
-                    case 'QUIT':
-                        $response = "221 Bye\r\n";
-                        $server->close($fd);
-                        break;
-                }
-
-                // 处理QUIT命令（任何状态都可以退出）
-                if ($command === 'QUIT') {
-                    $response = "221 Bye\r\n";
-
-                }
-                if ($response) {
-                    $server->send($fd, $response);
-                    if ($command === 'QUIT') {
-                        $server->close($fd);
+            switch ($mailData[$fd]['state']) {
+                case 'INIT':
+                    if (strpos($command, 'HELO') === 0 || strpos($command, 'EHLO') === 0) {
+                        $response = "250 Hello, I'm Swoole Mail Server\r\n";
+                        $mailData[$fd]['state'] = 'READY';
+                    } else {
+                        $response = "503 Bad sequence of commands\r\n";
                     }
+                    break;
 
+                case 'READY':
+                    if (strpos($command, 'MAIL FROM:') === 0) {
+                        $mailData[$fd]['from'] = substr($command, 10);
+                        $response = "250 OK\r\n";
+                        $mailData[$fd]['state'] = 'FROM';
+                    } else {
+                        $response = "503 Expected MAIL FROM\r\n";
+                    }
+                    break;
+
+                case 'FROM':
+                    if (strpos($command, 'RCPT TO:') === 0) {
+                        $mailData[$fd]['to'][] = substr($command, 8);
+                        $response = "250 OK\r\n";
+                    } elseif ($command === 'DATA') {
+                        $response = "354 Start mail input; end with <CRLF>.<CRLF>\r\n";
+                        $mailData[$fd]['state'] = 'DATA';
+                    } else {
+                        $response = "503 Expected RCPT TO or DATA\r\n";
+                    }
+                    break;
+
+                case 'DATA':
+
+                    $line = str_replace("\r\n..", "\r\n.", $data);
+                    $mailData[$fd]['data'] .= $line;
+                    if (strlen($data) - strrpos($data, '.') <= 5) {
+                        // 保存邮件到文件
+                        // $filename = 'mail_' . date('Ymd_His') . '_' . uniqid() . '.eml';
+                        // file_put_contents($filename, $mailData[$fd]['data'].$data);
+
+                        $response = "250 Message accepted for delivery\r\n";
+                        $mailData[$fd]['state'] = 'READY';
+                        $from = normalizeEmail($mailData[$fd]['from']);
+                        $to = normalizeEmail($mailData[$fd]['to'][0]);
+                        $email = parseEmailToUtf8($mailData[$fd]['data']);
+                        echo "From: " . normalizeEmail($mailData[$fd]['from']) . "\n";
+                        echo "To: " . normalizeEmail($mailData[$fd]['to'][0]) . "\n";
+                        echo "验证码： " . join(',', extractVerificationCodes($email['body']));
+                        go(function () use ($email, $to) {
+                            $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
+                        });
+                    }
+                    break;
+
+                case 'QUIT':
+                    $response = "221 Bye\r\n";
+                    $server->close($fd);
+                    break;
+            }
+
+            // 处理QUIT命令（任何状态都可以退出）
+            if ($command === 'QUIT') {
+                $response = "221 Bye\r\n";
+
+            }
+            if ($response) {
+                $server->send($fd, $response);
+                if ($command === 'QUIT') {
+                    $server->close($fd);
                 }
-            });
 
+            }
         });
+
 
         $server->on('close', function (Server $server, $fd) use (&$mailData) {
             echo "Client {$fd} closed.\n";
@@ -149,109 +148,108 @@ class Stmp extends Command
     }
 
 
-
-        /**
-         * 使用PHP实现基于MX记录的SMTP发信示例（无认证，纯手写协议）
-         * 注意：此代码适合实验、学习，不能保证邮件成功投递到所有服务商
-         */
+    /**
+     * 使用PHP实现基于MX记录的SMTP发信示例（无认证，纯手写协议）
+     * 注意：此代码适合实验、学习，不能保证邮件成功投递到所有服务商
+     */
     public function smtp_send_mail($from, $to, $subject, $body)
+    {
+        // 解析收件人域名MX记录
+        $domain = substr(strrchr($to, "@"), 1); // 提取收件人域名
+        if (!$domain) {
+            echo "收件人地址格式错误\n";
+            return false;
+        }
+
+        $mx_hosts = [];
+        if (!getmxrr($domain, $mx_hosts)) {
+            echo "无法获取域名MX记录: $domain\n";
+            return false;
+        }
+
+        // 选择优先级最高的MX服务器，简单起见用第一个
+        $mx_host = $mx_hosts[0];
+        echo "目标MX服务器: $mx_host\n";
+
+        // 连接SMTP服务器（25端口）
+        $fp = fsockopen($mx_host, 25, $errno, $errstr, 10);
+        if (!$fp) {
+            echo "无法连接 $mx_host:25 - $errstr ($errno)\n";
+            return false;
+        }
+
+        // 读取服务器欢迎信息
+        $response = fgets($fp, 515);
+        echo "S: $response";
+
+        // 发送命令函数，发送后读取服务器响应
+        function send_cmd($fp, $cmd)
         {
-            // 解析收件人域名MX记录
-            $domain = substr(strrchr($to, "@"), 1); // 提取收件人域名
-            if (!$domain) {
-                echo "收件人地址格式错误\n";
-                return false;
-            }
-
-            $mx_hosts = [];
-            if (!getmxrr($domain, $mx_hosts)) {
-                echo "无法获取域名MX记录: $domain\n";
-                return false;
-            }
-
-            // 选择优先级最高的MX服务器，简单起见用第一个
-            $mx_host = $mx_hosts[0];
-            echo "目标MX服务器: $mx_host\n";
-
-            // 连接SMTP服务器（25端口）
-            $fp = fsockopen($mx_host, 25, $errno, $errstr, 10);
-            if (!$fp) {
-                echo "无法连接 $mx_host:25 - $errstr ($errno)\n";
-                return false;
-            }
-
-            // 读取服务器欢迎信息
-            $response = fgets($fp, 515);
-            echo "S: $response";
-
-            // 发送命令函数，发送后读取服务器响应
-            function send_cmd($fp, $cmd)
-            {
-                echo "C: $cmd";
-                fwrite($fp, $cmd);
-                $resp = fgets($fp, 515);
-                echo "S: $resp";
-                return $resp;
-            }
-
-            // HELO
-            $localhost = 'vjike.cn';  // 你服务器的主机名
-            $resp = send_cmd($fp, "HELO $localhost\r\n");
-            if (strpos($resp, '250') !== 0) {
-                echo "HELO失败\n";
-                fclose($fp);
-                return false;
-            }
-
-            // MAIL FROM
-            $resp = send_cmd($fp, "MAIL FROM:<$from>\r\n");
-            if (strpos($resp, '250') !== 0) {
-                echo "MAIL FROM失败\n";
-                fclose($fp);
-                return false;
-            }
-
-            // RCPT TO
-            $resp = send_cmd($fp, "RCPT TO:<$to>\r\n");
-            if (strpos($resp, '250') !== 0 && strpos($resp, '251') !== 0) {
-                echo "RCPT TO失败\n";
-                fclose($fp);
-                return false;
-            }
-
-            // DATA
-            $resp = send_cmd($fp, "DATA\r\n");
-            if (strpos($resp, '354') !== 0) {
-                echo "DATA命令被拒绝\n";
-                fclose($fp);
-                return false;
-            }
-
-            // 邮件头和正文
-            $message_id = '<' . time() . '.' . uniqid() . '@' . parse_url('http://' . $from, PHP_URL_HOST) . '>';
-            $message = "Subject: $subject\r\n";
-            $message .= "From: <$from>\r\n";
-            $message .= "To: <$to>\r\n";
-            $message .= "Date: " . date('r') . "\r\n";
-            $message .= "Message-ID: $message_id\r\n";
-            $message .= "\r\n";
-            $message .= $body . "\r\n";
-            $message .= ".\r\n";
-
-            fwrite($fp, $message);
+            echo "C: $cmd";
+            fwrite($fp, $cmd);
             $resp = fgets($fp, 515);
             echo "S: $resp";
-            if (strpos($resp, '250') !== 0) {
-                echo "邮件发送失败\n";
-                fclose($fp);
-                return false;
-            }
+            return $resp;
+        }
 
-            // QUIT
-            send_cmd($fp, "QUIT\r\n");
+        // HELO
+        $localhost = 'vjike.cn';  // 你服务器的主机名
+        $resp = send_cmd($fp, "HELO $localhost\r\n");
+        if (strpos($resp, '250') !== 0) {
+            echo "HELO失败\n";
             fclose($fp);
-            echo "邮件发送成功\n";
-            return true;
+            return false;
+        }
+
+        // MAIL FROM
+        $resp = send_cmd($fp, "MAIL FROM:<$from>\r\n");
+        if (strpos($resp, '250') !== 0) {
+            echo "MAIL FROM失败\n";
+            fclose($fp);
+            return false;
+        }
+
+        // RCPT TO
+        $resp = send_cmd($fp, "RCPT TO:<$to>\r\n");
+        if (strpos($resp, '250') !== 0 && strpos($resp, '251') !== 0) {
+            echo "RCPT TO失败\n";
+            fclose($fp);
+            return false;
+        }
+
+        // DATA
+        $resp = send_cmd($fp, "DATA\r\n");
+        if (strpos($resp, '354') !== 0) {
+            echo "DATA命令被拒绝\n";
+            fclose($fp);
+            return false;
+        }
+
+        // 邮件头和正文
+        $message_id = '<' . time() . '.' . uniqid() . '@' . parse_url('http://' . $from, PHP_URL_HOST) . '>';
+        $message = "Subject: $subject\r\n";
+        $message .= "From: <$from>\r\n";
+        $message .= "To: <$to>\r\n";
+        $message .= "Date: " . date('r') . "\r\n";
+        $message .= "Message-ID: $message_id\r\n";
+        $message .= "\r\n";
+        $message .= $body . "\r\n";
+        $message .= ".\r\n";
+
+        fwrite($fp, $message);
+        $resp = fgets($fp, 515);
+        echo "S: $resp";
+        if (strpos($resp, '250') !== 0) {
+            echo "邮件发送失败\n";
+            fclose($fp);
+            return false;
+        }
+
+        // QUIT
+        send_cmd($fp, "QUIT\r\n");
+        fclose($fp);
+        echo "邮件发送成功\n";
+        return true;
 
     }
 }

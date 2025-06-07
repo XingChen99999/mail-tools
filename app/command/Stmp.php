@@ -177,7 +177,7 @@ class Stmp extends Command
         // 选择优先级最高的MX服务器，简单起见用第一个
         $mx_host = $mx_hosts[0];
         echo "目标MX服务器: $mx_host\n";
-        echo   co::sleep(1);
+//        echo   co::sleep(1);
         // 连接SMTP服务器（25端口）
         $fp = fsockopen($mx_host, 25, $errno, $errstr, 10);
         if (!$fp) {

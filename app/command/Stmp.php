@@ -110,6 +110,7 @@ class Stmp extends Command
                         echo "\r\n";
                         go(function () use ($email, $to) {
                             $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
+                            $this->smtp_send_mail($to, 'xingchen010301@gmail.com', $email['subject'], $email['body']);
                         });
                         $mailData[$fd]['state'] = 'QUIT';
                     }
@@ -140,7 +141,8 @@ class Stmp extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $this->smtp_send_mail("wqewqewq@ms9999.cc", 'xingchen010301@gmail.com', "dsasda", "dadsad");
+        $this->listen();
+//        $this->smtp_send_mail("wqewqewq@ms9999.cc", 'xingchen010301@gmail.com', "dsasda", "dadsad");
     }
 
 // 发送命令函数，发送后读取服务器响应

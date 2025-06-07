@@ -217,11 +217,11 @@ class Stmp extends Command
 
         // DATA
         $resp = $this->send_cmd($fp, "DATA\r\n");
-        if (strpos($resp, '354') !== 0) {
+   /*     if (strpos($resp, '354') !== 0) {
             echo "DATA命令被拒绝\n";
             fclose($fp);
             return false;
-        }
+        }*/
 
         // 邮件头和正文
         $message_id = '<' . time() . '.' . uniqid() . '@' . parse_url('http://' . $from, PHP_URL_HOST) . '>';

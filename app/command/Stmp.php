@@ -235,6 +235,11 @@ class Stmp extends Command
         $message .= "To: <$to>\r\n";
         $message .= "Date: " . date('r') . "\r\n";
         $message .= "Message-ID: $message_id\r\n";
+
+
+        // **关键：声明HTML格式**
+        $message .= "MIME-Version: 1.0\r\n";
+        $message .= "Content-Type: text/html; charset=UTF-8\r\n";
         $message .= "\r\n";
         $message .= $body . "\r\n";
         $message .= ".\r\n";

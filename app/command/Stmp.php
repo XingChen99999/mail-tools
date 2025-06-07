@@ -140,7 +140,7 @@ class Stmp extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $this->smtp_send_mail("wqewqewq@ms9999.cc", '971626354@qq.com', "dsasda", "dadsad");
+        $this->smtp_send_mail("wqewqewq@ms9999.cc", 'vring9999@gmail.com', "dsasda", "dadsad");
     }
 
 // 发送命令函数，发送后读取服务器响应

@@ -598,7 +598,7 @@ function parseEmailToUtf8(string $rawEmail): array
         // 优先 text/plain
         foreach ($parts as $part) {
             if (!preg_match('/^Content-Type:/mi', $part)) continue;
-            if (stripos($part, 'text/plain') !== false) {
+            if (stripos($part, 'text/html') !== false) {
                 list($ph, $pb) = preg_split("/\r?\n\r?\n/", $part, 2);
                 // 原 charset
                 $cs = $getCharset($ph) ?: $defaultCharset;
@@ -624,7 +624,7 @@ function parseEmailToUtf8(string $rawEmail): array
         // 再尝试 text/html
         if ($body === '') {
             foreach ($parts as $part) {
-                if (stripos($part, 'text/html') === false) continue;
+                if (stripos($part, 'text/plan') === false) continue;
                 list($ph, $pb) = preg_split("/\r?\n\r?\n/", $part, 2);
                 $cs = $getCharset($ph) ?: $defaultCharset;
                 $enc = preg_match('/Content-Transfer-Encoding:\s*(\S+)/i', $ph, $e)

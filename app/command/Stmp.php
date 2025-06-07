@@ -30,7 +30,6 @@ class Stmp extends Command
             // 其他 SSL 选项
             'ssl_verify_peer' => false,
             'ssl_allow_self_signed' => true,
-            ‘
         ]);
 // 存储每个连接的邮件数据
         $mailData = [];

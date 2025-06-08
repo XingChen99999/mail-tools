@@ -15,7 +15,7 @@
 
     <!-- 验证码区域 -->
     <view class="card" v-if="state.emailData.message_not_read">
-      <text class="card-title">实时邮件</text>
+      <text class="card-title">实时邮件 - {{formatTimeAgoFromUnix(state.emailData.message_not_read.create_time)}}</text>
       <view class="code-box" id="code-text">
         <text class="code-text" style="word-break: break-all">{{ state.emailData.message_not_read.code }}</text>
       </view>
@@ -175,6 +175,20 @@ const switchEmail = () => {
       }
     }
   })
+}
+function formatTimeAgoFromUnix(unixTime) {
+  const now = Date.now(); // 当前时间（毫秒）
+  const isSecond = String(unixTime).length === 10;
+  const timeMs = isSecond ? unixTime * 1000 : unixTime;
+  const diff = Math.floor((now - timeMs) / 1000); // 差值（秒）
+
+  if (diff < 10) return '刚刚';
+  if (diff < 60) return `${diff} 秒前`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`;
+
+   return `${Math.floor(diff / 86400)} 天前`;
+
 }
 
 onLoad(async () => {

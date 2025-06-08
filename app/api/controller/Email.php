@@ -13,7 +13,7 @@ class Email extends Frontend
         $res = \app\admin\model\Email::with('message_not_read')->when($this->request->post('email'), function ($query) {
             $query->where('address', $this->request->post('email'));
         })->order('id', 'desc')->find();
-        if ($res->message_not_read) {
+        if (isset($res->message_not_read)) {
             $res->message_not_read->is_read = 1;
             $res->message_not_read->save();
 //            $res->message->each(function ($item) {
@@ -26,7 +26,9 @@ class Email extends Frontend
 //                'is_read'=>1
 //            ]);
         }
-
+        if (!$res){
+            $this->error('没有数据');
+        }
         $this->success('', $res);
     }
 

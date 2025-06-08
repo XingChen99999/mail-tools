@@ -2,7 +2,7 @@
   <view class="app-container">
     <!-- 接码邮箱区域 -->
     <view class="card">
-      <text class="card-title">接码邮箱</text>
+      <text class="card-title">接码邮箱 - {{timer}}</text>
       <view class="email-display">
         <text class="email-text">{{ state.emailAddress }}</text>
       </view>
@@ -15,7 +15,7 @@
 
     <!-- 验证码区域 -->
     <view class="card" v-if="state.emailData.message_not_read">
-      <text class="card-title">实时邮件- {{timer}}</text>
+      <text class="card-title">实时邮件</text>
       <view class="code-box" id="code-text">
         <text class="code-text" style="word-break: break-all">{{ state.emailData.message_not_read.code }}</text>
       </view>

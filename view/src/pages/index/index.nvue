@@ -154,9 +154,14 @@ const generateSub = () => {
 }
 
 const generateSubAndCopy = async () => {
-  copyText(123)
+  // copyText(123)
   let e = await generateSub()
 
+  navigator.clipboard.writeText(123).then(() => {
+    alert("复制成功！");
+  }).catch(err => {
+    alert("复制失败：" + err);
+  });
 }
 
 

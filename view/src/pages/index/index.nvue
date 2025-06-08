@@ -58,14 +58,19 @@ const storeEmail = {
 
 const loadEmail = () => {
   return index({email: storeEmail.get()}).then(res => {
-    if (res.code === 1) {
-      state.emailData = res.data
-      if (res.data.address) {
-        state.emailAddress = res.data.address
-        storeEmail.set(res.data.address)
+    try{
+      if (res.code === 1) {
+        state.emailData = res.data
+        if (res.data.address) {
+          state.emailAddress = res.data.address
+          storeEmail.set(res.data.address)
 
+        }
       }
+    }catch (e){
+      alert(e)
     }
+
     // console.log(res)
   })
 }
@@ -150,6 +155,9 @@ const generateSubAndCopy = () => {
 
 
 onLoad(async () => {
+  window.onerror = function (message, source, lineno, colno, error) {
+    alert(`错误: ${message}\n来源: ${source}\n行: ${lineno}:${colno}`);
+  };
   await loadEmail()
   initTaskLoadEmail();
 

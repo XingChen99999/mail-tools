@@ -80,7 +80,11 @@ class Email extends Frontend
         if ($res) {
             $this->success();
         } else {
-            $this->error('没有数据');
+            \app\admin\model\Email::create([
+                'address'=>$e
+            ]);
+            $this->success();
+//            $this->error('没有数据');
         }
     }
 

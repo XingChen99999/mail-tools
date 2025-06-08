@@ -16,4 +16,14 @@ class Email extends Model
     protected $autoWriteTimestamp = true;
     protected $updateTime = false;
 
+    public function message()
+    {
+        return $this->hasMany(Message::class, 'email_id', 'id')->order('id', 'desc');
+    }
+
+
+    public function messageNotRead()
+    {
+        return  $this->hasOne(Message::class, 'email_id', 'id')->order('id', 'desc');
+    }
 }

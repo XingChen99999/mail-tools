@@ -157,10 +157,14 @@ const generateSubAndCopy = async () => {
   // copyText(123)
   let e = await generateSub()
 
-  navigator.clipboard.writeText(123).then(() => {
-    alert("复制成功！");
-  }).catch(err => {
-    alert("复制失败：" + err);
+  navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
+    if (result.state === "granted" || result.state === "prompt") {
+      navigator.clipboard.writeText("Hello World")
+          .then(() => alert("复制成功"))
+          .catch(err => alert("失败：" + err));
+    } else {
+      alert("没有复制权限");
+    }
   });
 }
 

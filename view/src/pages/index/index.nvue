@@ -9,6 +9,7 @@
       <view class="button-group">
         <button class="neo-button" @click="copyText(state.emailAddress)">点击复制邮箱</button>
         <button class="neo-button" @click="generateSub">随机生成邮箱</button>
+        <button class="neo-button" @click="switchEmail">切换指定邮箱</button>
       </view>
     </view>
 
@@ -35,7 +36,7 @@
 <script setup>
 import {reactive,ref} from 'vue'
 import {onLoad, onShow, onReady, onUnload} from '@dcloudio/uni-app'
-import {index, generate} from "../../api";
+import {index, generate, check} from "../../api";
 import {load as cheerioLoad} from 'cheerio'
 
 const state = reactive({
@@ -57,7 +58,6 @@ const storeEmail = {
 
 const loadEmail = () => {
   return index({email: storeEmail.get()}).then(res => {
-
       if (res.code === 1) {
         state.emailData = res.data
         if (res.data.address) {
@@ -152,7 +152,30 @@ const generateSub = () => {
   })
 }
 
-
+const switchEmail = () => {
+  uni.showModal({
+    title: '切换邮箱',
+    content:  state.emailAddress,
+    placeholderText: '输入要切换的指定邮箱地址',
+    editable:true,
+    success: (e) => {
+      if (e.confirm){
+        uni.showLoading()
+        check(  e.content).then((res)=>{
+          if (res.code === 1) {
+            storeEmail.set(e.content)
+            loadEmail()
+            uni.showToast({title: "已切换到："+e.content,  icon: 'none'})
+          }else{
+            uni.showToast({title: "切換的邮箱不存在", icon: 'none'})
+          }
+        }).finally(() => {
+          uni.hideLoading()
+        })
+      }
+    }
+  })
+}
 
 onLoad(async () => {
 
@@ -167,8 +190,11 @@ onShow(async () => {
 
 
 </script>
+<style>
 
-<style lang="scss">
+</style>
+<style lang="scss" >
+
 .app-container {
   min-height: 100vh;
   background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);

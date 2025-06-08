@@ -72,4 +72,16 @@ class Email extends Frontend
         return $username . $domain;
     }
 
+
+    public function checkEmail()
+    {
+        $e = $this->request->post('email');
+        $res = \app\admin\model\Email::where('address', $e)->find();
+        if ($res) {
+            $this->success();
+        } else {
+            $this->error('没有数据');
+        }
+    }
+
 }

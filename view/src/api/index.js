@@ -8,3 +8,7 @@ export const index = (data) => {
 export const generate = () => {
   return request("/api/email/generate",'POST');
 };
+
+export const check = (email) => {
+  return request("/api/email/checkEmail",'POST',{email});
+};

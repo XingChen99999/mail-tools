@@ -60,7 +60,10 @@
 	    left: 0;
 	    right: 0;
 	} */
-
+  .uni-modal__textarea {
+    font-size: 14px !important;
+    font-family: 微软雅黑;
+  }
 	uni-page-body {
 		background-color: #F5F5F5 !important;
 		min-height: 100% !important;

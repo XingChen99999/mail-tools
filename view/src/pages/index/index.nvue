@@ -15,21 +15,26 @@
 
     <!-- 验证码区域 -->
     <view class="card" v-if="state.emailData.message_not_read">
-      <text class="card-title">实时邮件</text>
-      <view class="code-box">
-        <text class="code-text">{{ state.emailData.message_not_read.code }}</text>
+      <text class="card-title">实时邮件- {{timer}}</text>
+      <view class="code-box" id="code-text">
+        <text class="code-text" style="word-break: break-all">{{ state.emailData.message_not_read.code }}</text>
       </view>
       <view class="info-box">
-        <text style="word-break: break-all">{{ cheerioLoad(state.emailData.message_not_read.content).text().replace(/\s+/g, ' ').trim() }}</text>
+        <text style="word-break: break-all">
+          {{ cheerioLoad(state.emailData.message_not_read.content).text().replace(/\s+/g, ' ').trim() }}
+        </text>
       </view>
-      <button v-if="state.emailData.message_not_read.code" class="neo-button" @click="copyText(state.emailData.message_not_read.code)">点击复制验证码</button>
+      <button v-if="state.emailData.message_not_read.code" class="neo-button"
+              @click="copyText(state.emailData.message_not_read.code)">点击复制验证码
+      </button>
     </view>
+
   </view>
 </template>
 
 
 <script setup>
-import {reactive} from 'vue'
+import {reactive,ref} from 'vue'
 import {onLoad, onShow, onReady, onUnload} from '@dcloudio/uni-app'
 import {index, generate} from "../../api";
 import {load as cheerioLoad} from 'cheerio'
@@ -58,17 +63,18 @@ const loadEmail = () => {
       if (res.data.address) {
         state.emailAddress = res.data.address
         storeEmail.set(res.data.address)
+
       }
     }
     // console.log(res)
   })
 }
 
-let timer;
+let timer = ref();
 
 const initTaskLoadEmail = () => {
   const task = () => {
-    timer = setTimeout(async () => {
+    timer.value = setTimeout(async () => {
       await loadEmail()
       task()
     }, 2000)
@@ -139,6 +145,9 @@ const generateSubAndCopy = () => {
     copyText(email)
   })
 }
+
+
+
 
 onLoad(async () => {
   await loadEmail()
@@ -225,7 +234,7 @@ onShow(async () => {
   text-align: center;
   color: #ffffff;
   margin-bottom: 30rpx;
-  letter-spacing: 6rpx;
+  //letter-spacing: 6rpx;
 }
 
 .info-box {

@@ -2,14 +2,13 @@
   <view class="app-container">
     <!-- 接码邮箱区域 -->
     <view class="card">
-      <text class="card-title">接码邮箱 - {{timer}}</text>
-      <view class="email-display">
+      <text class="card-title">接码邮箱</text>
+      <view class="email-display" v-if="state.emailAddress">
         <text class="email-text">{{ state.emailAddress }}</text>
       </view>
       <view class="button-group">
         <button class="neo-button" @click="copyText(state.emailAddress)">点击复制邮箱</button>
-        <button class="neo-button" @click="generateSub">随机邮箱</button>
-        <button class="neo-button" @click="generateSubAndCopy">随机邮箱并复制</button>
+        <button class="neo-button" @click="generateSub">随机生成邮箱</button>
       </view>
     </view>
 
@@ -152,22 +151,6 @@ const generateSub = () => {
     })
   })
 }
-
-const generateSubAndCopy = async () => {
-  // copyText(123)
-  let e = await generateSub()
-
-
-    const input = document.createElement('input');
-    input.value = e;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-    alert("复制成功（兼容方式）");
-
-}
-
 
 
 

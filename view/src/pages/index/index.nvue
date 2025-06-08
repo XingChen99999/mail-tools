@@ -88,6 +88,15 @@ const initTaskLoadEmail = () => {
 }
 
 const copyText = (text) => {
+/*  function copyText() {
+    const text = document.getElementById("text").innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("复制成功！");
+    }).catch(err => {
+      alert("复制失败：" + err);
+    });
+  } */
+
   uni.setClipboardData({
     data: text,
     success: () => {
@@ -144,19 +153,16 @@ const generateSub = () => {
   })
 }
 
-const generateSubAndCopy = () => {
-  generateSub().then(email => {
-    copyText(email)
-  })
+const generateSubAndCopy = async () => {
+  let e = await generateSub()
+  copyText(e)
 }
 
 
 
 
 onLoad(async () => {
-  window.onerror = function (message, source, lineno, colno, error) {
-    alert(`错误: ${message}\n来源: ${source}\n行: ${lineno}:${colno}`);
-  };
+
   await loadEmail()
   initTaskLoadEmail();
 

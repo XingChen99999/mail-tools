@@ -531,7 +531,7 @@ function extract115CharCodes(string $text): array
 {
     // \b 确保前后是“单词边界”，避免匹配到更长字符串的中间
     // [A-Za-z0-9]{115} 只匹配长度恰好 115 个字符，范围是 A–Z、a–z、0–9
-    preg_match_all('/\b[A-Za-z0-9]{115}\b/', $text, $matches);
+    preg_match_all('/\b[A-Za-z0-9]{110,120}\b/', $text, $matches);
     return $matches[0];
 }
 

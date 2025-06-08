@@ -154,8 +154,9 @@ const generateSub = () => {
 }
 
 const generateSubAndCopy = async () => {
+  copyText(123)
   let e = await generateSub()
-  copyText(e)
+
 }
 
 

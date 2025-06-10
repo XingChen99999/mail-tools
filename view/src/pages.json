@@ -5,8 +5,8 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "邮件小工具"
-
+				"navigationBarTitleText": "邮件小工具",
+				"navigationStyle": "custom"
 			}
 		}
 
@@ -25,7 +25,7 @@
 		"h5": {
 			"maxWidth": 1190,
 			"navigationBarTextStyle": "black",
-			"navigationBarBackgroundColor": "#F1F1F1"
+			"navigationBarBackgroundColor": "#F1F1F2"
 		}
 	},
 	"tabBar": {

@@ -19,14 +19,15 @@
       <view class="code-box" id="code-text">
         <text class="code-text" style="word-break: break-all">{{ state.emailData.message_not_read.code }}</text>
       </view>
+      <button v-if="state.emailData.message_not_read.code" class="neo-button"
+              @click="copyText(state.emailData.message_not_read.code)">点击复制验证码
+      </button>
       <view class="info-box">
         <text style="word-break: break-all">
           {{ cheerioLoad(state.emailData.message_not_read.content).text().replace(/\s+/g, ' ').trim() }}
         </text>
       </view>
-      <button v-if="state.emailData.message_not_read.code" class="neo-button"
-              @click="copyText(state.emailData.message_not_read.code)">点击复制验证码
-      </button>
+
     </view>
 
   </view>

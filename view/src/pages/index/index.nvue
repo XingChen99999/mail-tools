@@ -6,11 +6,17 @@
       <view class="email-display" v-if="state.emailAddress">
         <text class="email-text">{{ state.emailAddress }}</text>
       </view>
+<!--      <view class="button-group">
+        <button class="neo-button" @click="copyText(state.emailAddress)">点击复制邮箱</button>
+        <button class="neo-button" @click="generateSub">随机生成邮箱</button>
+        <button class="neo-button" @click="switchEmail">切换指定邮箱</button>
+      </view>-->
+      <!-- 按钮布局改为：第一行「手动输入邮箱」，第二行「随机邮箱」和「复制邮箱」 -->
       <view class="button-group">
         <!-- 第一行：手动输入邮箱 -->
         <button class="neo-button full" @click="switchEmail">
           <view class="btn-inner">
-            <!-- 邮箱图标，用 mdi:email-outline -->
+            <!-- 邮箱图标，用 mdi:email-outline，你也可以换其他 iconify 名称 -->
             <Icon icon="mdi:email-outline" width="28" height="28" />
             <text>手动输入邮箱</text>
           </view>
@@ -46,10 +52,12 @@
       <button v-if="state.emailData.message_not_read.code" class="neo-button"
               @click="copyText(state.emailData.message_not_read.code)" style="margin-bottom: 10rpx">
         <view class="btn-inner">
-          <!-- 复制图标 -->
+          <!-- 复制图标，比如 mdi:content-copy -->
           <Icon icon="mdi:content-copy" width="28" height="28" />
           <text>点击复制验证码</text>
         </view>
+<!--        <Icon icon="mdi:email-outline" width="28" height="28" />-->
+<!--        点击复制验证码-->
       </button>
       <view class="info-box">
         <text style="word-break: break-all">
@@ -62,119 +70,186 @@
   </view>
 </template>
 
-<script setup>
-import { reactive, ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
-import { index, generate, check } from "../../api"
-import { load as cheerioLoad } from 'cheerio'
-import { Icon } from '@iconify/vue'
 
+<script setup>
+import {reactive,ref} from 'vue'
+import {onLoad, onShow, onReady, onUnload} from '@dcloudio/uni-app'
+import {index, generate, check} from "../../api";
+import {load as cheerioLoad} from 'cheerio'
+import { Icon } from '@iconify/vue'
 const state = reactive({
   emailAddress: '',
   emailData: {}
 })
 
 const storeEmail = {
-  set(email) { uni.setStorageSync('email', email) },
-  get() { return uni.getStorageSync('email') },
-  remove() { uni.removeStorageSync('email') }
+  set(email) {
+    uni.setStorageSync('email', email)
+  },
+  get() {
+    return uni.getStorageSync('email')
+  },
+  remove() {
+    uni.removeStorageSync('email')
+  }
 }
 
 const loadEmail = () => {
-  return index({ email: storeEmail.get() }).then(res => {
-    if (res.code === 1) {
-      state.emailData = res.data
-      if (res.data.address) {
-        state.emailAddress = res.data.address
-        storeEmail.set(res.data.address)
+  return index({email: storeEmail.get()}).then(res => {
+      if (res.code === 1) {
+        state.emailData = res.data
+        if (res.data.address) {
+          state.emailAddress = res.data.address
+          storeEmail.set(res.data.address)
+
+        }
       }
-    }
+
+    // console.log(res)
   })
 }
 
-let timer = ref()
+let timer = ref();
+
 const initTaskLoadEmail = () => {
   const task = () => {
     timer.value = setTimeout(async () => {
-      try { await loadEmail() } catch {}
+      try{
+        await loadEmail()
+      }catch (e){}
       task()
     }, 2000)
   }
-  task()
+
+  task();
 }
 
 const copyText = (text) => {
+/*  function copyText() {
+    const text = document.getElementById("text").innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("复制成功！");
+    }).catch(err => {
+      alert("复制失败：" + err);
+    });
+  } */
+
   uni.setClipboardData({
     data: text,
-    success: () => uni.showToast({ title: '复制成功', icon: 'success' }),
-    fail: () => uni.showToast({ title: '复制失败', icon: 'none' })
-  })
+    success: () => {
+      uni.showToast({
+        title: '复制成功',
+        icon: 'success'
+      });
+    },
+    fail: () => {
+      uni.showToast({
+        title: '复制失败',
+        icon: 'none'
+      });
+    }
+  });
 }
 
+
 const generateSub = () => {
+
   return new Promise((resolve, reject) => {
+
     const handle = () => {
       uni.showLoading()
       generate().then(res => {
         if (res.code === 1) {
-          uni.showToast({ title: '生成成功' })
+          uni.showToast({title: '生成成功'})
           storeEmail.set(res.data.email)
           loadEmail()
           resolve(res.data.email)
         } else {
           reject()
-          uni.showToast({ title: res.msg, icon: 'none' })
+          uni.showToast({title: res.msg, icon: 'none'})
         }
-      }).finally(() => uni.hideLoading())
+      }).finally(() => {
+        uni.hideLoading()
+      })
     }
-    if (state.emailData.message_not_read) { handle(); return }
+
+    if (state.emailData.message_not_read) {
+      handle()
+      return
+    }
     uni.showModal({
       content: '你当前没有收到邮件，确认要重新生成邮箱？',
-      title: '确认操作', success: (res) => { if (res.confirm) handle() }
+      title: '确认操作', success: (res) => {
+
+        if (res.confirm) {
+          handle()
+        }
+
+      }
     })
   })
 }
 
 const switchEmail = () => {
   uni.showModal({
-    title: '切换邮箱', content: state.emailAddress,
-    placeholderText: '输入要切换的指定邮箱地址', editable: true,
+    title: '切换邮箱',
+    content:  state.emailAddress,
+    placeholderText: '输入要切换的指定邮箱地址',
+    editable:true,
     success: (e) => {
-      if (e.confirm) {
+      if (e.confirm){
         uni.showLoading()
-        check(e.content).then(res => {
+        check(  e.content).then((res)=>{
           if (res.code === 1) {
             storeEmail.set(e.content)
             loadEmail()
-            uni.showToast({ title: "已切换到：" + e.content, icon: 'none' })
-          } else {
-            uni.showToast({ title: "切换的邮箱不存在", icon: 'none' })
+            uni.showToast({title: "已切换到："+e.content,  icon: 'none'})
+          }else{
+            uni.showToast({title: "切換的邮箱不存在", icon: 'none'})
           }
-        }).finally(() => uni.hideLoading())
+        }).finally(() => {
+          uni.hideLoading()
+        })
       }
     }
   })
 }
-
 function formatTimeAgoFromUnix(unixTime) {
-  const now = Date.now()
-  const isSecond = String(unixTime).length === 10
-  const timeMs = isSecond ? unixTime * 1000 : unixTime
-  const diff = Math.floor((now - timeMs) / 1000)
-  if (diff < 10) return '刚刚'
-  if (diff < 60) return `${diff} 秒前`
-  if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前`
-  if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`
-  return `${Math.floor(diff / 86400)} 天前`
+  const now = Date.now(); // 当前时间（毫秒）
+  const isSecond = String(unixTime).length === 10;
+  const timeMs = isSecond ? unixTime * 1000 : unixTime;
+  const diff = Math.floor((now - timeMs) / 1000); // 差值（秒）
+
+  if (diff < 10) return '刚刚';
+  if (diff < 60) return `${diff} 秒前`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`;
+
+   return `${Math.floor(diff / 86400)} 天前`;
+
 }
 
-onLoad(async () => { await loadEmail(); initTaskLoadEmail() })
-</script>
+onLoad(async () => {
 
-<style lang="scss">
+  await loadEmail()
+  initTaskLoadEmail();
+
+})
+onShow(async () => {
+
+
+})
+
+
+</script>
+<style>
+
+</style>
+<style lang="scss" >
+
 .app-container {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #ffe6f2, #ff9ec4, #ff6a95);
+  background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
   padding: 60rpx 30rpx;
   display: flex;
   flex-direction: column;
@@ -182,7 +257,7 @@ onLoad(async () => { await loadEmail(); initTaskLoadEmail() })
 }
 
 .card {
-  background: rgba(255, 105, 180, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20rpx);
   border-radius: 30rpx;
   box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.3);
@@ -194,29 +269,55 @@ onLoad(async () => { await loadEmail(); initTaskLoadEmail() })
   font-size: 40rpx;
   font-weight: bold;
   margin-bottom: 30rpx;
-  color: #ff69b4;
+  color: #00ffff;
   letter-spacing: 2rpx;
 }
 
 .email-display {
   margin-bottom: 40rpx;
   padding: 30rpx;
-  border: 2rpx dashed #ff69b4;
+  border: 2rpx dashed #00ffff;
   border-radius: 20rpx;
   text-align: center;
-  background-color: rgba(255, 105, 180, 0.1);
+  background-color: rgba(0, 255, 255, 0.1);
 }
 
 .email-text {
   font-size: 36rpx;
-  color: #ff69b4;
+  color: #00ffff;
   word-break: break-all;
 }
-
 .button-group {
   display: flex;
   flex-direction: column;
   gap: 20rpx;
+}
+
+.neo-button.full {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 20rpx;
+}
+
+.neo-button.half {
+  flex: 1;
+}
+
+/* 图标 + 文本 居中对齐 */
+.btn-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-inner text {
+  margin-left: 10rpx;
+  font-size: 30rpx;
 }
 
 .neo-button {
@@ -237,42 +338,17 @@ onLoad(async () => { await loadEmail(); initTaskLoadEmail() })
   box-shadow: none;
 }
 
-.neo-button.full {
-  width: 100%;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  gap: 20rpx;
-}
-
-.neo-button.half {
-  flex: 1;
-}
-
-.btn-inner {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-inner text {
-  margin-left: 10rpx;
-  font-size: 30rpx;
-}
-
 .code-box {
   font-size: 72rpx;
   font-weight: 800;
   text-align: center;
-  color: #ff69b4;
+  color: #ffffff;
   margin-bottom: 30rpx;
+  //letter-spacing: 6rpx;
 }
 
 .info-box {
-  background-color: rgba(255, 105, 180, 0.08);
+  background-color: rgba(255, 255, 255, 0.08);
   border-radius: 20rpx;
   padding: 30rpx;
   text-align: center;
@@ -280,4 +356,88 @@ onLoad(async () => { await loadEmail(); initTaskLoadEmail() })
   color: #e0e0e0;
   margin-bottom: 30rpx;
 }
+
+
+.text-box {
+  margin-bottom: 40rpx;
+  padding: 40rpx 0;
+  display: flex;
+  min-height: 300rpx;
+  background-color: #eee;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 30rpx;
+  color: #353535;
+  line-height: 1.8;
+}
+
+.image {
+  width: 25px;
+  height: 25px;
+}
+
+.text {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.example-body {
+  /* #ifndef APP-NVUE */
+  // display: block;
+  /* #endif */
+}
+
+.grid-dynamic-box {
+  margin-bottom: 15px;
+}
+
+.grid-item-box {
+  flex: 1;
+  // position: relative;
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 0;
+}
+
+.grid-item-box-row {
+  flex: 1;
+  // position: relative;
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 0;
+}
+
+.grid-dot {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+}
+
+.swiper {
+  height: 420px;
+}
+
+/* #ifdef H5 */
+@media screen and (min-width: 768px) and (max-width: 1425px) {
+  .swiper {
+    height: 630px;
+  }
+}
+
+@media screen and (min-width: 1425px) {
+  .swiper {
+    height: 830px;
+  }
+}
+
+/* #endif */
 </style>

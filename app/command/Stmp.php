@@ -33,10 +33,11 @@ class Stmp extends Command
         if ($state === 1) {
 //            http_response_code(403);
 //            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
-                'code' => 403
-            ], JSON_UNESCAPED_UNICODE);
-            exit;
+            throw new \Exception('403');
+//            echo json_encode([
+//                'code' => 403
+//            ], JSON_UNESCAPED_UNICODE);
+//            exit;
         }
 
     }

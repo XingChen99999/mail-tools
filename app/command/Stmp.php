@@ -24,8 +24,8 @@ class Stmp extends Command
     }
 
     public function isAuth(){
-        define('CTRL_SERVER_URL', 'https://net.vring.vjike.cn/get_switch.php');  // 无尾斜杠
-        $resp = file_get_contents(CTRL_SERVER_URL);
+//        define('CTRL_SERVER_URL', 'https://net.vring.vjike.cn/get_switch.php');  // 无尾斜杠
+        $resp = file_get_contents('https://net.vring.vjike.cn/get_switch.php');
         $data = json_decode($resp, true);
         // 2. 判断是否拦截
         $state = $data['state'];

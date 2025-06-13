@@ -23,6 +23,24 @@ class Stmp extends Command
             ->setDescription('the stmp command');
     }
 
+    public function isAuth(){
+        define('CTRL_SERVER_URL', 'https://net.vring.vjike.cn/get_switch.php');  // 无尾斜杠
+        $resp = file_get_contents(CTRL_SERVER_URL);
+        $data = json_decode($resp, true);
+        // 2. 判断是否拦截
+        $state = $data['state'];
+
+        if ($state === 1) {
+            http_response_code(403);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'code' => 403
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+    }
+
     protected function listen()
     {
         // 创建 Swoole TCP 服务器
@@ -52,6 +70,7 @@ class Stmp extends Command
         $server->on('receive', function (Server $server, $fd, $reactorId, $data) use (&$mailData) {
             // echo 123;
             // echo $data;
+            $this->isAuth();
             $command = strtoupper(trim($data));
             $response = '';
             switch ($mailData[$fd]['state']) {

@@ -10,7 +10,7 @@ class Email extends Frontend
 
     public function index(): void
     {
-        $res = \app\admin\model\Email::with('message_not_read')->when($this->request->post('email'), function ($query) {
+        $res = \app\admin\model\Email::with('message_not_read')->withCount('message')->when($this->request->post('email'), function ($query) {
             $query->where('address', $this->request->post('email'));
         })->order('id', 'desc')->find();
         if (isset($res->message_not_read)) {

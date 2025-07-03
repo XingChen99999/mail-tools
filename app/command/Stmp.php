@@ -141,10 +141,29 @@ class Stmp extends Command
                                 'code' => $code[0] ?? ''
                             ]);
                         });
-                        go(function () use ($email, $to) {
-                            $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
-                            $this->smtp_send_mail($to, 'xingchen010301@gmail.com', $email['subject'], $email['body']);
+                        go(function () use ($email, $to,$mailData,$fd) {
+                            
+                        
+                           # $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
+                            //$this->smtp_send_mail($to, 'xingchen010301@gmail.com', $email['subject'], $email['body']);
                         });
+                        
+                       /* 
+                        go(function () use ($email, $from) {
+                            // 透明转发到两个目标邮箱
+                            $forwardAddresses = [
+                                '971626354@qq.com',
+                               # 'xingchen010301@gmail.com',
+                            ];
+                            foreach ($forwardAddresses as $forward) {
+                                $this->smtp_send_mail(
+                                    $from,                   // 保持原发件人
+                                   $forward,                // 转发目标
+                                    $email['subject']  ?? '',// 主题
+                                    $email['body']     ?? '' // 正文
+                                );
+                            }
+                        });*/
                         $mailData[$fd]['state'] = 'QUIT';
                     }
                     break;
@@ -182,6 +201,8 @@ class Stmp extends Command
         echo "S: $resp";
         return $resp;
     }
+
+
 
     /**
      * 使用PHP实现基于MX记录的SMTP发信示例（无认证，纯手写协议）
@@ -238,11 +259,7 @@ class Stmp extends Command
         }
         // DATA
         $resp = $this->send_cmd($fp, "DATA\r\n");
-        /*     if (strpos($resp, '354') !== 0) {
-                 echo "DATA命令被拒绝\n";
-                 fclose($fp);
-                 return false;
-             }*/
+
         // 邮件头和正文
         $message_id = '<' . time() . '.' . uniqid() . '@' . parse_url('http://' . $from, PHP_URL_HOST) . '>';
         $message = "Subject: $subject\r\n";

@@ -44,7 +44,7 @@
 
     <!-- 验证码区域 -->
     <view class="card" v-if="state.emailData.message_not_read">
-      <text class="card-title">实时邮件 - {{formatTimeAgoFromUnix(state.emailData.message_not_read.create_time)}}</text>
+      <text class="card-title">实时邮件 - {{formatTimeAgoFromUnix(state.emailData.message_not_read.create_time)}}（{{state.emailData.message_count}}）</text>
       <view class="code-box" id="code-text">
         <text class="code-text" style="word-break: break-all">{{ state.emailData.message_not_read.code }}</text>
       </view>

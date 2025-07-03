@@ -145,7 +145,7 @@ class Stmp extends Command
                             
                         
                            # $this->smtp_send_mail($to, '971626354@qq.com', $email['subject'], $email['body']);
-                            //$this->smtp_send_mail($to, 'xingchen010301@gmail.com', $email['subject'], $email['body']);
+
                         });
                         
                        /* 

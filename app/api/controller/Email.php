@@ -59,7 +59,7 @@ class Email extends Frontend
     static protected function generateRandomEmail()
     {
         $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        $length = rand(8, 12); // 随机长度 8~12
+        $length = rand(12, 18); // 随机长度 8~12
         $username = '';
 
         for ($i = 0; $i < $length; $i++) {
